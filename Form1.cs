@@ -39,7 +39,8 @@ namespace UDP_Grafiti_Wall
             {
                 byte[] B = U.Receive(ref EP);   //訊息到達時讀取資訊到B[]
                 string A = Encoding.Default.GetString(B);   //翻譯B陣列為字串A
-                string[] Q = A.Split('/');  //切割座標點資訊
+                string[] S = A.Split('_');
+                string[] Q = S[1].Split('/');  //切割座標點資訊
                 Point[] R = new Point[Q.Length];    //宣告座標點陣列
                 for(int i = 0; i < Q.Length; i++)
                 {
@@ -51,6 +52,21 @@ namespace UDP_Grafiti_Wall
                 {
                     LineShape L = new LineShape();  //建立線段物件
                     L.StartPoint = R[i];    //線段起點
+                    switch (S[0])
+                    {
+                        case "1":
+                            L.BorderColor = Color.Red;
+                            break;
+                        case "2":
+                            L.BorderColor = Color.Lime;
+                            break;
+                        case "3":
+                            L.BorderColor = Color.Blue;
+                            break;
+                        case "4":
+                            L.BorderColor = Color.Black;
+                            break;
+                    }
                     L.EndPoint = R[i + 1];  //線段終點
                     L.Parent = D;   //線段L加入畫布D(遠端使用者繪圖)
                 }
@@ -101,6 +117,10 @@ namespace UDP_Grafiti_Wall
                 LineShape L = new LineShape();  //建立線段物件
                 L.StartPoint = stP; //線段起點
                 L.EndPoint = e.Location;    //線段終點
+                if (radioButton1.Checked) { L.BorderColor = Color.Red; }    //紅筆
+                if (radioButton2.Checked) { L.BorderColor = Color.Lime; }    //亮綠色筆
+                if (radioButton3.Checked) { L.BorderColor = Color.Blue; }    //藍筆
+                if (radioButton4.Checked) { L.BorderColor = Color.Black; }    //黑筆
                 L.Parent = C;   //線段加入畫布C
                 stP = e.Location;   //終點變起點
                 p += "/" + stP.X.ToString() + "," + stP.Y.ToString();   //持續記錄座標
@@ -112,6 +132,10 @@ namespace UDP_Grafiti_Wall
         {
             int Port = int.Parse(textBox2.Text);    //設定發送的目標Port
             UdpClient S = new UdpClient(textBox1.Text, Port);   //建立UDP物件
+            if (radioButton1.Checked) { p = "1_" + p; } //紅筆
+            if (radioButton2.Checked) { p = "2_" + p; } //亮綠色筆
+            if (radioButton3.Checked) { p = "3_" + p; } //藍筆
+            if (radioButton4.Checked) { p = "4_" + p; } //黑筆
             byte[] B = Encoding.Default.GetBytes(p);    //翻譯p字串為B陣列
             S.Send(B, B.Length);    //發送資料
             S.Close();  //關閉UDP物件
